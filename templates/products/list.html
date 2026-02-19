@@ -16,14 +16,14 @@
             </h3>
             <ul class="space-y-3">
                 <li>
-                    <a href="{% url " product_list" %}"
+                    <a href="{% url 'product_list' %}"
                         class="block px-4 py-2.5 rounded-xl text-sm transition-all {% if not category %}bg-blue-600 text-white font-semibold shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-blue-600{% endif %}">
                         All Collections
                     </a>
                 </li>
                 {% for cat in categories %}
                 <li>
-                    <a href="{% url " product_list_by_category" cat.slug %}"
+                    <a href="{% url 'product_list_by_category' cat.slug %}"
                         class="block px-4 py-2.5 rounded-xl text-sm transition-all {% if category == cat %}bg-blue-600 text-white font-semibold shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-blue-600{% endif %}">
                         {{ cat.name }}
                     </a>
@@ -38,9 +38,9 @@
                         <select name="sort" onchange="this.form.submit()"
                             class="w-full bg-white border border-gray-200 text-gray-700 py-2.5 px-4 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none cursor-pointer">
                             <option value="">Sort by: Featured</option>
-                            <option value="price_low" {% if request.GET.sort=="price_low" %}selected{% endif %}>Price:
+                            <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>Price:
                                 Low to High</option>
-                            <option value="price_high" {% if request.GET.sort=="price_high" %}selected{% endif %}>Price:
+                            <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>Price:
                                 High to Low</option>
                         </select>
                         <div
@@ -89,15 +89,12 @@
                         <h4
                             class="font-bold text-xs sm:text-sm text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-1">
                             {{ product.name }}</h4>
-                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">{{
-                            product.category.name }}</p>
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">{{ product.category.name }}</p>
 
                         <div class="flex items-center gap-2">
                             {% if product.discount_price %}
-                            <span class="text-sm sm:text-base font-extrabold text-gray-900">${{ product.discount_price
-                                }}</span>
-                            <span class="text-[10px] sm:text-xs font-medium text-gray-400 line-through">${{
-                                product.price }}</span>
+                            <span class="text-sm sm:text-base font-extrabold text-gray-900">${{ product.discount_price }}</span>
+                            <span class="text-[10px] sm:text-xs font-medium text-gray-400 line-through">${{ product.price }}</span>
                             {% else %}
                             <span class="text-sm sm:text-base font-extrabold text-gray-900">${{ product.price }}</span>
                             {% endif %}
