@@ -42,7 +42,7 @@ def login_view(request):
             if next_url:
                 return redirect(next_url)
             # Role-based redirect
-            if user.role == 'seller':
+            if user.role in ['admin', 'seller'] or user.is_superuser:
                 return redirect('/admin/')
             return redirect('product_list')
         else:
