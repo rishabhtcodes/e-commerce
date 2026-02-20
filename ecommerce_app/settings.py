@@ -89,6 +89,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.cart_processor',
+                'products.context_processors.category_processor',
             ],
             'libraries': {
                 'product_filters': 'products.templatetags.product_filters',
