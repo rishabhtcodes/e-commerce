@@ -34,7 +34,24 @@
                 <!-- Desktop Links -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="/" class="nav-link">Shop</a>
-                    <a href="/products/" class="nav-link">Categories</a>
+                    
+                    <!-- Categories Dropdown (Desktop) -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center gap-1">
+                            Categories
+                            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 rounded-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50" 
+                             style="background: var(--bg); border: 1px solid var(--border); box-shadow: var(--shadow-lg);">
+                            <a href="{% url 'product_list' %}" class="block px-4 py-2 text-sm font-medium transition-colors" style="color: var(--text-primary); border-bottom: 1px solid var(--border);">All Categories</a>
+                            {% for c in global_categories %}
+                            <a href="{% url 'product_list_by_category' c.slug %}" class="block px-4 py-2 text-sm transition-colors hover:bg-black/5 dark:hover:bg-white/5" style="color: var(--text-secondary);">{{ c.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
                     {% if user.is_authenticated %}
                         {% if user.role == 'seller' %}
                         <a href="{% url 'product_create' %}" class="nav-link" style="color: var(--accent); font-weight: 500;">+ Add Product</a>
@@ -117,7 +134,17 @@
         <!-- Mobile Nav -->
         <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-1" style="border-top: 1px solid var(--border);">
             <a href="/" class="block px-3 py-2.5 rounded-lg text-sm font-medium" style="color: var(--text-secondary);">Shop</a>
-            <a href="/products/" class="block px-3 py-2.5 rounded-lg text-sm font-medium" style="color: var(--text-secondary);">Categories</a>
+            
+            <div class="px-3 py-2">
+                <p class="text-xs font-bold tracking-wider uppercase mb-2" style="color: var(--text-muted);">Categories</p>
+                <div class="pl-2 border-l-2 space-y-1" style="border-color: var(--border);">
+                    <a href="{% url 'product_list' %}" class="block py-1.5 text-sm" style="color: var(--text-secondary);">All Products</a>
+                    {% for c in global_categories %}
+                    <a href="{% url 'product_list_by_category' c.slug %}" class="block py-1.5 text-sm" style="color: var(--text-secondary);">{{ c.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+
             {% if user.is_authenticated %}
                 {% if user.role == 'seller' %}
                 <a href="{% url 'product_create' %}" class="block px-3 py-2.5 rounded-lg text-sm font-medium" style="color: var(--accent);">+ Add Product</a>

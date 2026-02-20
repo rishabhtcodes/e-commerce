@@ -18,7 +18,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+from django.conf import settings
+
 class Product(models.Model):
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
