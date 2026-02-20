@@ -1,127 +1,207 @@
 {% extends 'base.html' %}
-{% block title %}Explore Products - E-Commerce{% endblock %}
+{% block title %}Shop All Products - Store{% endblock %}
 
 {% block content %}
-<div class="flex flex-col lg:flex-row gap-10">
-    <!-- Premium Sidebar Filters -->
-    <aside class="w-full lg:w-72 flex-shrink-0">
-        <div class="glass p-6 rounded-2xl sticky top-24">
-            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                    </path>
-                </svg>
-                Categories
-            </h3>
-            <ul class="space-y-3">
-                <li>
-                    <a href="{% url 'product_list' %}"
-                        class="block px-4 py-2.5 rounded-xl text-sm transition-all {% if not category %}bg-blue-600 text-white font-semibold shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-blue-600{% endif %}">
-                        All Collections
-                    </a>
-                </li>
-                {% for cat in categories %}
-                <li>
-                    <a href="{% url 'product_list_by_category' cat.slug %}"
-                        class="block px-4 py-2.5 rounded-xl text-sm transition-all {% if category == cat %}bg-blue-600 text-white font-semibold shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-blue-600{% endif %}">
-                        {{ cat.name }}
-                    </a>
-                </li>
+<!-- ─── Hero Section (only on main list, not category filter) ─── -->
+{% if not category and not request.GET.q %}
+<section class="hero mb-12 animate-fade-up">
+    <div class="flex flex-col lg:flex-row items-center gap-8 p-8 lg:p-16">
+        <div class="flex-1 space-y-6">
+            <p class="text-sm font-medium tracking-widest uppercase" style="color: var(--accent);">Curated Collections</p>
+            <h1 class="hero-title">Discover Our<br>Premium Store<span style="color: var(--accent);">.</span></h1>
+            <p class="hero-subtitle">We bring you the finest curated products — handpicked for quality, style, and value. Start exploring today.</p>
+            <div class="flex items-center gap-4 pt-2">
+                <a href="#products" class="btn-primary">
+                    Go Shopping
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <div class="flex-1 hidden lg:block">
+            <div class="grid grid-cols-2 gap-4">
+                {% for product in products|slice:":4" %}
+                <a href="{{ product.get_absolute_url }}" class="block rounded-xl overflow-hidden aspect-square" style="background: var(--bg-muted);">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                    {% endif %}
+                </a>
                 {% endfor %}
-            </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
 
-            <div class="mt-10 pt-8 border-t border-gray-100">
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Sort Selection</h3>
+<div id="products">
+    <!-- ─── Mobile Categories (horizontal pills) ─── -->
+    <div class="lg:hidden mb-6">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+            <a href="{% url 'product_list' %}"
+                class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all"
+                style="{% if not category %}background: var(--accent); color: white;{% else %}background: var(--bg-soft); color: var(--text-secondary); border: 1px solid var(--border);{% endif %}">
+                All
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'product_list_by_category' cat.slug %}"
+                class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all"
+                style="{% if category == cat %}background: var(--accent); color: white;{% else %}background: var(--bg-soft); color: var(--text-secondary); border: 1px solid var(--border);{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+
+            <!-- Mobile Sort -->
+            <form method="GET" action="" class="flex-shrink-0 ml-auto">
+                <select name="sort" onchange="this.form.submit()"
+                    class="px-3 py-2 rounded-full text-xs font-medium cursor-pointer outline-none"
+                    style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-secondary);">
+                    <option value="">Sort: Featured</option>
+                    <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>Price ↑</option>
+                    <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>Price ↓</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-10">
+    <!-- ─── Desktop Sidebar ─── -->
+    <aside class="hidden lg:block w-60 flex-shrink-0">
+        <div class="sticky top-24 space-y-8">
+            <div>
+                <h3 class="text-xs font-semibold tracking-widest uppercase mb-4" style="color: var(--text-muted);">Categories</h3>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="{% url 'product_list' %}"
+                            class="block px-3 py-2 rounded-lg text-sm font-medium transition-all
+                            {% if not category %}font-semibold{% endif %}"
+                            style="{% if not category %}color: var(--accent); background: var(--accent-light);{% else %}color: var(--text-secondary);{% endif %}">
+                            All Products
+                        </a>
+                    </li>
+                    {% for cat in categories %}
+                    <li>
+                        <a href="{% url 'product_list_by_category' cat.slug %}"
+                            class="block px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                            style="{% if category == cat %}color: var(--accent); background: var(--accent-light);{% else %}color: var(--text-secondary);{% endif %}">
+                            {{ cat.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-semibold tracking-widest uppercase mb-4" style="color: var(--text-muted);">Sort By</h3>
                 <form method="GET" action="">
-                    <div class="relative">
-                        <select name="sort" onchange="this.form.submit()"
-                            class="w-full bg-white border border-gray-200 text-gray-700 py-2.5 px-4 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none cursor-pointer">
-                            <option value="">Sort by: Featured</option>
-                            <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>Price:
-                                Low to High</option>
-                            <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>Price:
-                                High to Low</option>
-                        </select>
-                        <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
-                    </div>
+                    <select name="sort" onchange="this.form.submit()"
+                        class="w-full py-2.5 px-3 rounded-lg text-sm focus:outline-none focus:ring-1 cursor-pointer"
+                        style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-primary);">
+                        <option value="">Featured</option>
+                        <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>Price: Low → High</option>
+                        <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>Price: High → Low</option>
+                    </select>
                 </form>
             </div>
         </div>
     </aside>
 
-    <!-- Refined Product Grid -->
+    <!-- ─── Product Grid ─── -->
     <div class="flex-grow animate-fade-up">
-        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+        {% if category %}
+        <div class="mb-8">
+            <h2 class="section-title">{{ category.name }}</h2>
+            <p class="section-subtitle">Browse our {{ category.name|lower }} collection</p>
+        </div>
+        {% elif request.GET.q %}
+        <div class="mb-8">
+            <h2 class="section-title">Search: "{{ request.GET.q }}"</h2>
+            <p class="section-subtitle">{{ products|length }} result{{ products|length|pluralize }}</p>
+        </div>
+        {% else %}
+        <div class="mb-8">
+            <h2 class="section-title">Shop All</h2>
+            <p class="section-subtitle">Our complete collection</p>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 lg:gap-6">
             {% for product in products %}
-            <div class="card-premium group hover-lift ring-1 ring-black/5 flex flex-col">
-                <a href="{{ product.get_absolute_url }}" class="flex-grow">
-                    <div class="relative aspect-square bg-gray-100 overflow-hidden">
+            <div class="product-card group">
+                <a href="{{ product.get_absolute_url }}">
+                    <div class="product-image relative">
                         {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
                         {% else %}
-                        <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                        <div class="w-full h-full flex items-center justify-center" style="color: var(--text-muted);">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                         </div>
                         {% endif %}
 
-                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300">
-                        </div>
-
                         {% if product.discount_price %}
-                        <span
-                            class="absolute top-3 left-3 bg-red-500 text-white text-[9px] uppercase font-heavy px-2 py-0.5 rounded-full shadow-lg">Sale</span>
+                        <span class="sale-badge">Sale!</span>
                         {% endif %}
                     </div>
 
-                    <div class="p-3 sm:p-4">
-                        <h4
-                            class="font-bold text-xs sm:text-sm text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-1">
-                            {{ product.name }}</h4>
-                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">{{ product.category.name }}</p>
-
-                        <div class="flex items-center gap-2">
+                    <div class="product-info">
+                        <p class="product-category">{{ product.category.name }}</p>
+                        <h4 class="product-name line-clamp-1">{{ product.name }}</h4>
+                        <div class="product-price">
                             {% if product.discount_price %}
-                            <span class="text-sm sm:text-base font-extrabold text-gray-900">${{ product.discount_price }}</span>
-                            <span class="text-[10px] sm:text-xs font-medium text-gray-400 line-through">${{ product.price }}</span>
+                            <span class="original">${{ product.price }}</span>
+                            <span>${{ product.discount_price }}</span>
                             {% else %}
-                            <span class="text-sm sm:text-base font-extrabold text-gray-900">${{ product.price }}</span>
+                            <span>${{ product.price }}</span>
                             {% endif %}
                         </div>
                     </div>
                 </a>
-                <div class="px-3 sm:px-4 pb-3 sm:pb-4">
+
+                <div class="px-4 pb-4">
                     <form action="{% url 'cart:cart_add' product.id %}" method="post">
                         {% csrf_token %}
-                        <button type="submit"
-                            class="btn-premium w-full !rounded-lg !py-2.5 !text-xs shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-[0.98]">
+                        <button type="submit" class="btn-primary w-full !py-2.5 !text-xs justify-center">
                             Add to Cart
                         </button>
                     </form>
                 </div>
             </div>
             {% empty %}
-            <div class="col-span-full py-32 text-center glass rounded-3xl">
-                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                </svg>
-                <p class="text-xl font-bold text-gray-400">Our collections are currently being curated.</p>
-                <p class="text-gray-400 mt-2">Please check back again soon.</p>
+            <div class="col-span-full py-24 text-center">
+                <p class="text-lg font-medium" style="color: var(--text-muted);">No products found.</p>
+                <p class="text-sm mt-2" style="color: var(--text-muted);">Check back soon for new arrivals.</p>
             </div>
             {% endfor %}
         </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center items-center gap-2 mt-12">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                class="pagination-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <a href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                class="pagination-link {% if page_obj.number == num %}active{% endif %}">{{ num }}</a>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                class="pagination-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
     </div>
 </div>
 {% endblock %}

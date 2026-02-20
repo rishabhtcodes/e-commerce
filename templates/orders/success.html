@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Order Confirmed - Store{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-16 text-center animate-fade-up">
+    <div class="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style="background: var(--accent-light);">
+        <svg class="w-10 h-10" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+    </div>
+
+    <h1 class="text-3xl font-bold tracking-tight mb-2" style="color: var(--text-primary);">Order Confirmed!</h1>
+    <p class="text-sm mb-1" style="color: var(--text-secondary);">Thank you for your purchase.</p>
+    <p class="text-sm mb-8" style="color: var(--text-muted);">Order #{{ order.id }} · ${{ order.total_amount }}</p>
+
+    <div class="rounded-2xl p-6 mb-8 text-left" style="border: 1px solid var(--border);">
+        <h3 class="text-xs font-semibold uppercase tracking-widest mb-4" style="color: var(--text-muted);">Order Summary</h3>
+        <div class="space-y-3">
+            {% for item in order.items.all %}
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style="background: var(--bg-soft);">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+                <div class="flex-grow">
+                    <p class="text-sm font-medium" style="color: var(--text-primary);">{{ item.product.name }}</p>
+                    <p class="text-xs" style="color: var(--text-muted);">Qty: {{ item.quantity }}</p>
+                </div>
+                <p class="text-sm font-bold" style="color: var(--text-primary);">${{ item.price }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="flex justify-between font-bold mt-4 pt-4 text-sm" style="border-top: 1px solid var(--border); color: var(--text-primary);">
+            <span>Total</span>
+            <span>${{ order.total_amount }}</span>
+        </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="{% url 'orders:detail' order.id %}" class="btn-outline">View Order Details</a>
+        <a href="{% url 'product_list' %}" class="btn-primary">Continue Shopping</a>
+    </div>
+</div>
+{% endblock %}

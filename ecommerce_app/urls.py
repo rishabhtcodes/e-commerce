@@ -5,12 +5,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')), # default auth urls
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),  # Custom auth views (login/logout/signup)
+    path('accounts/', include('django.contrib.auth.urls')),  # Password reset etc.
     path('products/', include('products.urls')),
     path('cart/', include('cart.urls', namespace='cart')),
+    path('orders/', include('orders.urls', namespace='orders')),
     path('api/', include('api.urls')),
-    path('', include('products.urls')), # Home redirects to products for now
+    path('', include('products.urls')),  # Home redirects to products
 ]
 
 if settings.DEBUG:

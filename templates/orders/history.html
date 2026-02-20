@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Order History - Store{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 animate-fade-up">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold tracking-tight" style="color: var(--text-primary);">My Orders</h2>
+        <p class="text-sm font-medium" style="color: var(--text-muted);">{{ orders.count }} order{{ orders.count|pluralize }}</p>
+    </div>
+
+    {% if orders %}
+    <div class="space-y-4">
+        {% for order in orders %}
+        <a href="{% url 'orders:detail' order.id %}" class="block rounded-2xl p-6 transition-all hover-lift" style="border: 1px solid var(--border);">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <h3 class="text-sm font-bold" style="color: var(--text-primary);">Order #{{ order.id }}</h3>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                            {% if order.status == 'Pending' %}bg-amber-50 text-amber-600
+                            {% elif order.status == 'Shipped' %}bg-blue-50 text-blue-600
+                            {% elif order.status == 'Delivered' %}bg-emerald-50 text-emerald-600
+                            {% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </div>
+                    <p class="text-xs" style="color: var(--text-muted);">{{ order.created_at|date:"M d, Y · h:i A" }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-xs" style="color: var(--text-muted);">Total</p>
+                        <p class="text-lg font-bold" style="color: var(--accent);">${{ order.total_amount }}</p>
+                    </div>
+                    <svg class="w-4 h-4 hidden sm:block" style="color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Items Preview -->
+            <div class="flex items-center gap-2 mt-4 pt-4" style="border-top: 1px solid var(--border-light);">
+                {% for item in order.items.all|slice:":4" %}
+                <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style="background: var(--bg-soft);">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if order.items.count > 4 %}
+                <span class="text-xs font-medium" style="color: var(--text-muted);">+{{ order.items.count|add:"-4" }} more</span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 rounded-2xl" style="border: 1px solid var(--border);">
+        <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: var(--accent-light);">
+            <svg class="w-8 h-8" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-bold mb-1" style="color: var(--text-primary);">No orders yet</h3>
+        <p class="text-sm mb-6" style="color: var(--text-muted);">When you buy something, your orders will appear here.</p>
+        <a href="{% url 'product_list' %}" class="btn-primary">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -8,6 +8,8 @@ django.setup()
 
 from products.models import Category, Product
 from django.utils.text import slugify
+import urllib.request
+from django.core.files.base import ContentFile
 
 def seed_data():
     print("Clearing existing data...")
@@ -46,7 +48,7 @@ def seed_data():
 
     for p_data in products_data:
         cat = Category.objects.get(name=p_data["category"])
-        Product.objects.create(
+        product = Product.objects.create(
             category=cat,
             name=p_data["name"],
             price=p_data["price"],
@@ -55,6 +57,16 @@ def seed_data():
             description=f"This is a premium {p_data['name']} from our {p_data['category']} collection.",
             is_available=True
         )
+        
+        print(f"Fetching image for {p_data['name']}...")
+        image_url = f"https://picsum.photos/600/400?random={random.randint(1, 10000)}"
+        try:
+            req = urllib.request.Request(image_url, headers={'User-Agent': 'Mozilla/5.0'})
+            response = urllib.request.urlopen(req)
+            product.image.save(f"{slugify(p_data['name'])}.jpg", ContentFile(response.read()), save=True)
+        except Exception as e:
+            print(f"Failed to fetch image for {p_data['name']}: {e}")
+            
         print(f"Created Product: {p_data['name']}")
 
     print("Seeding complete!")

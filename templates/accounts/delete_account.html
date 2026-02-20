@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Delete Account - Store{% endblock %}
+
+{% block content %}
+<div class="min-h-[65vh] flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full animate-fade-up">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #fef2f2;">
+                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold tracking-tight" style="color: var(--text-primary);">Delete Your Account</h2>
+            <p class="mt-2 text-sm" style="color: var(--text-secondary);">This action is permanent and cannot be undone. All your data, orders, and information will be lost.</p>
+        </div>
+
+        <div class="p-6 rounded-xl mb-6" style="background: #fef2f2; border: 1px solid #fecaca;">
+            <p class="text-sm font-medium text-red-700">
+                <strong>Warning:</strong> Deleting your account will permanently remove:
+            </p>
+            <ul class="mt-2 text-sm text-red-600 space-y-1 list-disc list-inside">
+                <li>Your profile and personal information</li>
+                <li>All order history</li>
+                <li>Cart items and wishlist</li>
+            </ul>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+                    Type <strong>DELETE</strong> to confirm
+                </label>
+                <input type="text" name="confirm_delete" required autocomplete="off"
+                    class="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                    style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-primary);"
+                    placeholder="Type DELETE here">
+            </div>
+            <button type="submit" class="w-full py-3.5 rounded-full font-medium text-sm bg-red-500 text-white hover:bg-red-600 transition-colors">
+                Permanently Delete My Account
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="{% url 'profile' %}" class="text-sm font-medium" style="color: var(--accent);">← Back to Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
