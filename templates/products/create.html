@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Add New Product - Store{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8">
+    <div class="mb-8 animate-fade-up">
+        <h1 class="text-3xl font-bold tracking-tight" style="color: var(--text-primary);">Add New Product</h1>
+        <p class="mt-2 text-sm" style="color: var(--text-secondary);">Create a new listing for your store catalog.</p>
+    </div>
+
+    <div class="p-6 md:p-8 rounded-2xl animate-fade-up" style="background: var(--bg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); animation-delay: 100ms;">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1.5" style="color: var(--text-primary);">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                
+                {% if field.name == 'is_available' %}
+                    <div class="flex items-center mt-2">
+                        <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" {% if field.value %}checked{% endif %}
+                            class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" style="accent-color: var(--accent);">
+                        <span class="ml-2 text-sm" style="color: var(--text-secondary);">Product is visible and available for purchase</span>
+                    </div>
+                {% elif field.name == 'category' %}
+                    <select name="{{ field.name }}" id="{{ field.id_for_label }}"
+                        class="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                        style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-primary);" {% if field.field.required %}required{% endif %}>
+                        {% for value, text in field.field.choices %}
+                            <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ text }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif field.name == 'image' %}
+                    <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" accept="image/*"
+                        class="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-primary);">
+                {% elif field.name == 'description' %}
+                    <textarea name="{{ field.name }}" id="{{ field.id_for_label }}" rows="4"
+                        class="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                        style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-primary);"
+                        {% if field.field.required %}required{% endif %}>{% if field.value %}{{ field.value }}{% endif %}</textarea>
+                {% else %}
+                    <input type="{% if field.name in 'price,discount_price,stock' %}number{% else %}text{% endif %}" 
+                        name="{{ field.name }}" id="{{ field.id_for_label }}" 
+                        {% if field.value %}value="{{ field.value }}"{% endif %}
+                        {% if field.name in 'price,discount_price' %}step="0.01"{% endif %}
+                        class="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                        style="background: var(--bg-soft); border: 1px solid var(--border); color: var(--text-primary);"
+                        {% if field.field.required %}required{% endif %}>
+                {% endif %}
+                
+                {% if field.help_text %}
+                <p class="mt-1.5 text-xs" style="color: var(--text-muted);">{{ field.help_text }}</p>
+                {% endif %}
+                
+                {% if field.errors %}
+                <p class="mt-1.5 text-xs text-red-500">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="pt-4 flex gap-4 border-t" style="border-color: var(--border);">
+                <a href="{% url 'product_list' %}" class="flex-1 py-3.5 px-4 rounded-xl font-medium text-sm text-center transition-colors" 
+                   style="background: var(--bg-soft); color: var(--text-primary); border: 1px solid var(--border);">
+                    Cancel
+                </a>
+                <button type="submit" class="flex-1 py-3.5 px-4 rounded-xl font-medium text-sm text-white transition-opacity hover:opacity-90"
+                    style="background: var(--accent);">
+                    Add Product
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

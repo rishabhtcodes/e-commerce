@@ -1,7 +1,28 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Category, Product
+from .forms import ProductForm
+
+
+@login_required
+def product_create(request):
+    if request.user.role != 'seller':
+        messages.error(request, "Only sellers can add products.")
+        return redirect('product_list')
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            messages.success(request, f"Product '{product.name}' added successfully!")
+            return redirect(product.get_absolute_url())
+    else:
+        form = ProductForm()
+
+    return render(request, 'products/create.html', {'form': form})
 
 
 def product_list(request, category_slug=None):
